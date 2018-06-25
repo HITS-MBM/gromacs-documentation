@@ -1,0 +1,401 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Bugs fixed &#8212; GROMACS 2018.2-dev-20180625-5a59b98c3 documentation</title>
+    <link rel="stylesheet" href="../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '2018.2-dev-20180625-5a59b98c3',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Removed mdrun features" href="removed-features.html" />
+    <link rel="prev" title="Improvements to GROMACS tools" href="tools.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="removed-features.html" title="Removed mdrun features"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="tools.html" title="Improvements to GROMACS tools"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">GROMACS 2018.2-dev</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Release notes</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="bugs-fixed">
+<h1>Bugs fixed<a class="headerlink" href="#bugs-fixed" title="Permalink to this headline">¶</a></h1>
+<p>These document fixes for issues that have been fixed for the 2016
+release, but which have not been back-ported to other branches.</p>
+<div class="section" id="fixed-two-problems-related-to-restarts-for-velocity-verlet">
+<h2>Fixed two problems related to restarts for velocity-Verlet<a class="headerlink" href="#fixed-two-problems-related-to-restarts-for-velocity-verlet" title="Permalink to this headline">¶</a></h2>
+<p>The first problem is more serious; in addition to causing problems
+with restarts in most cases for velocity-Verlet integrators plus either
+Berendsen or v-rescale temperature-coupling algorithms, the
+temperature coupling code was called twice. This made the distribution of
+kinetic energies too broad (but with the correct average).
+Other algorithm combinations were unaffected.</p>
+<p>In the second problem, the initial step after restarts with velocity-Verlet
+integrators and either Berendsen or v-rescale temperature-coupling algorithms
+had too high a pressure because they used an empty virial matrix that
+was only filled with MTTK pressure control. The effects of this bug were
+very small; it only affected the volume integration for one step on restarts.</p>
+<p><a class="reference external" href="https://redmine.gromacs.org/issues/1883">Issue 1883</a></p>
+</div>
+<div class="section" id="fixed-verlet-buffer-calculation-with-nstlist-1">
+<h2>Fixed Verlet buffer calculation with nstlist=1<a class="headerlink" href="#fixed-verlet-buffer-calculation-with-nstlist-1" title="Permalink to this headline">¶</a></h2>
+<p>Under rare circumstances the Verlet buffer calculation code was
+called with nstlist=1, which caused a division by zero. The division
+by zero is now avoided.
+Furthermore, grompp now also determines and prints the Verlet buffer
+sizes with nstlist=1, which provider the user information and adds
+consistency checks.</p>
+<p><a class="reference external" href="https://redmine.gromacs.org/issues/1993">Issue 1993</a></p>
+</div>
+<div class="section" id="fixed-large-file-issue-on-32-bit-platforms">
+<h2>Fixed large file issue on 32-bit platforms<a class="headerlink" href="#fixed-large-file-issue-on-32-bit-platforms" title="Permalink to this headline">¶</a></h2>
+<p>At some point gcc started to issue a warning instead of a fatal error
+for the checking code; fixed to really generate an error now.</p>
+<p><a class="reference external" href="https://redmine.gromacs.org/issues/1834">Issue 1834</a></p>
+</div>
+<div class="section" id="avoided-using-abort-for-fatal-errors">
+<h2>Avoided using abort() for fatal errors<a class="headerlink" href="#avoided-using-abort-for-fatal-errors" title="Permalink to this headline">¶</a></h2>
+<p>This avoids situations that produce useless core dumps.</p>
+<p><a class="reference external" href="https://redmine.gromacs.org/issues/1866">Issue 1866</a></p>
+</div>
+<div class="section" id="fixed-possible-division-by-zero-in-polarization-code">
+<h2>Fixed possible division by zero in polarization code<a class="headerlink" href="#fixed-possible-division-by-zero-in-polarization-code" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="avoided-numerical-overflow-with-overlapping-atoms-in-verlet-scheme">
+<h2>Avoided numerical overflow with overlapping atoms in Verlet scheme<a class="headerlink" href="#avoided-numerical-overflow-with-overlapping-atoms-in-verlet-scheme" title="Permalink to this headline">¶</a></h2>
+<p>The Verlet-scheme kernels did not allow overlapping atoms, even if
+they were not interacting (in contrast to the group kernels). Fixed by
+clamping the interaction distance so it can not become smaller than
+~6e-4 in single and ~1e-18 in double, and when this number is later
+multiplied by zero parameters it will not influence forces. The
+clamping should never affect normal interactions; mdrun would
+previously crash for distances that were this small.  On Haswell, RF
+and PME kernels get 3% and 1% slower, respectively.  On CUDA, RF and
+PME kernels get 1% and 2% faster, respectively.</p>
+<p><a class="reference external" href="https://redmine.gromacs.org/issues/1958">Issue 1958</a></p>
+</div>
+<div class="section" id="relax-pull-pbc-check">
+<h2>Relax pull PBC check<a class="headerlink" href="#relax-pull-pbc-check" title="Permalink to this headline">¶</a></h2>
+<p>The check in the pull code for COM distances close to half the box
+was too strict for directional pulling. Now dimensions orthogonal
+to the pull vector are no longer checked. (The check was actually
+not strict enough for directional pulling along x or y in triclinic
+units cells, but that is a corner case.)
+Furthermore, the direction-periodic hint is now only printed with
+geometry direction.</p>
+<p><a class="reference external" href="https://redmine.gromacs.org/issues/1962">Issue 1962</a></p>
+</div>
+<div class="section" id="add-detection-for-armv7-cycle-counter-support">
+<h2>Add detection for ARMv7 cycle counter support<a class="headerlink" href="#add-detection-for-armv7-cycle-counter-support" title="Permalink to this headline">¶</a></h2>
+<p>ARMv7 requires special kernel settings to allow cycle
+counters to be read. This change adds a cmake setting
+to enable/disable counters. On all architectures but ARMv7
+it is enabled by default, and on ARMv7 we run a small test
+program to see if the can be executed successfully. When
+cross-compiling to ARMv7 counters will be disabled, but
+either choice can be overridden by setting a value for
+GMX_CYCLECOUNTERS in cmake.</p>
+<p><a class="reference external" href="https://redmine.gromacs.org/issues/1933">Issue 1933</a></p>
+</div>
+<div class="section" id="introduced-fatal-error-for-too-few-frames-in-gmx-dos">
+<h2>Introduced fatal error for too few frames in <code class="docutils literal"><span class="pre">gmx</span> <span class="pre">dos</span></code><a class="headerlink" href="#introduced-fatal-error-for-too-few-frames-in-gmx-dos" title="Permalink to this headline">¶</a></h2>
+<p>To prevent <code class="docutils literal"><span class="pre">gmx</span> <span class="pre">dos</span></code> from crashing with an incomprehensible error
+message when there are too few frames, test for this.</p>
+<p>Part of <a class="reference external" href="https://redmine.gromacs.org/issues/1813">Issue 1813</a></p>
+</div>
+<div class="section" id="properly-reset-cuda-application-clocks">
+<h2>Properly reset CUDA application clocks<a class="headerlink" href="#properly-reset-cuda-application-clocks" title="Permalink to this headline">¶</a></h2>
+<p>We now store the application clock values we read when starting mdrun
+and reset to these values, but only when clocks have not been changed
+(by another process) in the meantime.</p>
+<p><a class="reference external" href="https://redmine.gromacs.org/issues/1846">Issue 1846</a></p>
+</div>
+<div class="section" id="fixed-replica-exchange-debug-output-to-all-go-to-the-debug-file">
+<h2>Fixed replica-exchange debug output to all go to the debug file<a class="headerlink" href="#fixed-replica-exchange-debug-output-to-all-go-to-the-debug-file" title="Permalink to this headline">¶</a></h2>
+<p>When <code class="docutils literal"><span class="pre">mdrun</span> <span class="pre">-debug</span></code> was selected with replica exchange, some of the
+order description was printed to mdrun’s log file, but it looks like the
+actual numbers were being printed to the debug log. This puts them
+both in the debug log.</p>
+</div>
+<div class="section" id="fixed-gmx-mdrun-membed-to-always-run-on-a-single-rank">
+<h2>Fixed gmx mdrun -membed to always run on a single rank<a class="headerlink" href="#fixed-gmx-mdrun-membed-to-always-run-on-a-single-rank" title="Permalink to this headline">¶</a></h2>
+<p>This used to give a fatal error if default thread-MPI mdrun had chosen
+more than one rank, but it will now correctly choose to use a single rank.</p>
+</div>
+<div class="section" id="fixed-issues-with-using-int-for-number-of-simulation-steps">
+<h2>Fixed issues with using int for number of simulation steps<a class="headerlink" href="#fixed-issues-with-using-int-for-number-of-simulation-steps" title="Permalink to this headline">¶</a></h2>
+<p>Mostly we use a 64-bit integer, but we messed up a few
+things.</p>
+<p>During mdrun -rerun, edr writing complained about the negative step
+number, implied it might be working around it, and threatened to
+crash, which it can’t do. Silenced the complaint during writing,
+and reduced the scope of the message when reading.</p>
+<p>Fixed TNG wrapper routines to pass a 64-bit integer like they should.</p>
+<p>Made various infrastructure use gmx_int64_t for consistency, and noted
+where in a few places the practical range of the value stored in such
+a type is likely to be smaller. We can’t extend the definition of XTC
+or TRR, so there is no proper solution available. TNG is already good,
+though.</p>
+<p><a class="reference external" href="https://redmine.gromacs.org/issues/2006">Issue 2006</a></p>
+</div>
+<div class="section" id="fixed-trr-magic-number-reading">
+<h2>Fixed trr magic-number reading<a class="headerlink" href="#fixed-trr-magic-number-reading" title="Permalink to this headline">¶</a></h2>
+<p>The trr header-reading routine returned an “OK” value even if the
+magic number was wrong, which might lead to chaotic results
+everywhere.  This led to problems if other code (e.g. cpptraj)
+mistakenly wrote a wrong-endian trr file, which was then used with
+GROMACS. (This should never be a thing for XDR files, which are
+defined to be big endian, but such code has existed.)</p>
+<p><a class="reference external" href="https://redmine.gromacs.org/issues/1926">Issue 1926</a></p>
+</div>
+<div class="section" id="changed-to-use-only-legal-characters-in-opencl-cache-filename">
+<h2>Changed to use only legal characters in OpenCL cache filename<a class="headerlink" href="#changed-to-use-only-legal-characters-in-opencl-cache-filename" title="Permalink to this headline">¶</a></h2>
+<p>The option to cache JIT-compiled OpenCL short-ranged kernels needed to
+be hardened, so that mdrun would write files whose names would usually
+be specific to the device, but also only contain filenames that would
+work everywhere, ie only alphanumeric characters from the current
+locale.</p>
+</div>
+</div>
+<div class="section" id="fixes-for-bugs-introduced-during-development">
+<h1>Fixes for bugs introduced during development<a class="headerlink" href="#fixes-for-bugs-introduced-during-development" title="Permalink to this headline">¶</a></h1>
+<p>These document fixes for issues that were identified as having been
+introduced into the release-2016 branch since it diverged from
+release-5-1. These will not appear in the final release notes, because
+no formal release is thought to have had the problem. Of course, the
+Redmine issues remain available should further discussion arise.</p>
+<div class="section" id="fixed-bug-in-v-rescale-thermostat-replica-exchange">
+<h2>Fixed bug in v-rescale thermostat &amp; replica exchange<a class="headerlink" href="#fixed-bug-in-v-rescale-thermostat-replica-exchange" title="Permalink to this headline">¶</a></h2>
+<p>Commit 2d0247f6 made random numbers for the v-rescale thermostat that
+did not vary over MD steps, and similarly the replica-exchange random
+number generator was being reset in the wrong place.</p>
+<p><a class="reference external" href="https://redmine.gromacs.org/issues/1968">Issue 1968</a></p>
+</div>
+<div class="section" id="fixed-vsite-bug-with-mpi-openmp">
+<h2>Fixed vsite bug with MPI+OpenMP<a class="headerlink" href="#fixed-vsite-bug-with-mpi-openmp" title="Permalink to this headline">¶</a></h2>
+<p>The recent commit b7e4f30d caused non-local virtual sites not be
+treated when using OpenMP. This means their coordinates lagged one
+step behind and their forces are not spread to the atoms, leading
+to small errors in the forces. Note that non-local virtual sites are
+only used when local virtual sites use them as a constructing atom;
+the most common case is a C/N in a CH3/NH3 group with vsite H’s.
+Also added a check on the vsite count for debug builds.</p>
+<p><a class="reference external" href="https://redmine.gromacs.org/issues/1981">Issue 1981</a></p>
+</div>
+<div class="section" id="fixed-some-thread-affinity-cases">
+<h2>Fixed some thread affinity cases<a class="headerlink" href="#fixed-some-thread-affinity-cases" title="Permalink to this headline">¶</a></h2>
+<p>Fixed one deadlock in newly refactored thread-affinity code, which
+happened with automatic pinning, if only part of the nodes were full.</p>
+<p>There is one deadlock still theoretically possible: if thread-MPI
+reports that setting the affinity is not possible only on a subset of
+ranks, the code deadlocks.  This has always been there and might never
+happen, so it is not fixed here.</p>
+</div>
+<div class="section" id="removed-openmp-overhead-at-high-parallelization">
+<h2>Removed OpenMP overhead at high parallelization<a class="headerlink" href="#removed-openmp-overhead-at-high-parallelization" title="Permalink to this headline">¶</a></h2>
+<p>Commit 6d98622d introduced OpenMP parallelization for for loops
+clearing rvecs of increasing rvecs. For small numbers of atoms per
+MPI rank this can increase the cost of the loop by up to a factor 10.
+This change disables OpenMP parallelization at low atom count.</p>
+</div>
+<div class="section" id="removed-std-thread-hardware-concurrency">
+<h2>Removed std::thread::hardware_concurrency()<a class="headerlink" href="#removed-std-thread-hardware-concurrency" title="Permalink to this headline">¶</a></h2>
+<p>We should not use std::thread::hardware_concurrency() for determining
+the logical processor count, since it only provides a hint.
+Note that we still have 3 different sources for this count left.</p>
+</div>
+<div class="section" id="added-support-for-linking-against-external-tinyxml-2">
+<h2>Added support for linking against external TinyXML-2<a class="headerlink" href="#added-support-for-linking-against-external-tinyxml-2" title="Permalink to this headline">¶</a></h2>
+<p>This permits convenient packaging of GROMACS by distributions, but
+it got lost from gerrit while rebasing.</p>
+<p><a class="reference external" href="https://redmine.gromacs.org/issues/1956">Issue 1956</a></p>
+</div>
+<div class="section" id="fixed-data-race-in-hwinfo-with-thread-mpi">
+<h2>Fixed data race in hwinfo with thread-MPI<a class="headerlink" href="#fixed-data-race-in-hwinfo-with-thread-mpi" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="https://redmine.gromacs.org/issues/1983">Issue 1983</a></p>
+</div>
+<div class="section" id="fixes-for-power7-big-endian">
+<h2>Fixes for Power7 big-endian<a class="headerlink" href="#fixes-for-power7-big-endian" title="Permalink to this headline">¶</a></h2>
+<p>Now compiles and passes all tests in both double and single precision
+with gcc 4.9.3, 5.4.0 and 6.1.0 for big-endian VSX.</p>
+<p>The change for the code in incrStoreU and decrStoreU addresses an
+apparent regression in 6.1.0, where the compiler thinks the type
+returned by vec_extract is a pointer-to-float, but my attempts a
+reduced test case haven’t reproduced the issue.</p>
+<p>Added some test cases that might hit more endianness cases in future.</p>
+<p>We have not been able to test this on little-endian Power8; there is
+a risk the gcc-specific permutations could be endian-sensitive. We’ll
+test this when we have hardware access, or if somebody runs the tests
+for us.</p>
+<p><a class="reference external" href="https://redmine.gromacs.org/issues/1997">Issue 1997</a>
+<a class="reference external" href="https://redmine.gromacs.org/issues/1988">Issue 1988</a></p>
+</div>
+<div class="section" id="reduce-hwloc-cpuid-test-requirements">
+<h2>Reduce hwloc &amp; cpuid test requirements<a class="headerlink" href="#reduce-hwloc-cpuid-test-requirements" title="Permalink to this headline">¶</a></h2>
+<p>On some non-x86 linux platforms hwloc does not report
+caches, which means it will fail our strict test
+requirements of full topology support. There is no
+problem whatsoever with this, so we reduce the
+test to only require basic support from hwloc - this
+is still better than anything we can get ourselves.
+Similarly for CPUID, it is not an error for an
+architecture to not provide any of the specific flags
+we have defined, so avoid marking it as such.</p>
+<p><a class="reference external" href="https://redmine.gromacs.org/issues/1987">Issue 1987</a></p>
+</div>
+<div class="section" id="work-around-compilation-issue-with-random-test-on-32-bit-machines">
+<h2>Work around compilation issue with random test on 32-bit machines<a class="headerlink" href="#work-around-compilation-issue-with-random-test-on-32-bit-machines" title="Permalink to this headline">¶</a></h2>
+<p>gcc 4.8.4 running on 32-bit Linux fails a few
+tests for random distributions. This seems
+to be caused by the compiler doing something
+strange (that can lead to differences in the lsb)
+when we do not use the result as floating-point
+values, but rather do exact binary comparisions.
+This is valid C++, and bad behaviour of the
+compiler (IMHO), but technically it is not required
+to produce bitwise identical results at high
+optimization. However, by using floating-point
+tests with zero ULP tolerance the problem
+appears to go away.</p>
+<p><a class="reference external" href="https://redmine.gromacs.org/issues/1986">Issue 1986</a></p>
+</div>
+<div class="section" id="updated-gmx-wham-for-the-new-pull-setup">
+<h2>Updated <code class="docutils literal"><span class="pre">gmx</span> <span class="pre">wham</span></code> for the new pull setup<a class="headerlink" href="#updated-gmx-wham-for-the-new-pull-setup" title="Permalink to this headline">¶</a></h2>
+<p>This bring <code class="docutils literal"><span class="pre">gmx</span> <span class="pre">wham</span></code> up to date with the new pull setup where the pull
+type and geometry can now be set per coordinate and the pull
+coordinate has changed and is more configurable.</p>
+</div>
+<div class="section" id="fix-membed-with-partial-revert-of-29943f">
+<h2>Fix membed with partial revert of 29943f<a class="headerlink" href="#fix-membed-with-partial-revert-of-29943f" title="Permalink to this headline">¶</a></h2>
+<p>The membrane embedding algorithm must be initialized before
+we call init_forcerec(), so it cannot trivially be moved into
+do_md(). This has to be cleaned up anyway for release-2017
+since we will remove the group scheme be then, but for now
+this fix will allow us have the method working in release-2016.</p>
+<p><a class="reference external" href="https://redmine.gromacs.org/issues/1998">Issue 1998</a></p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Bugs fixed</a><ul>
+<li><a class="reference internal" href="#fixed-two-problems-related-to-restarts-for-velocity-verlet">Fixed two problems related to restarts for velocity-Verlet</a></li>
+<li><a class="reference internal" href="#fixed-verlet-buffer-calculation-with-nstlist-1">Fixed Verlet buffer calculation with nstlist=1</a></li>
+<li><a class="reference internal" href="#fixed-large-file-issue-on-32-bit-platforms">Fixed large file issue on 32-bit platforms</a></li>
+<li><a class="reference internal" href="#avoided-using-abort-for-fatal-errors">Avoided using abort() for fatal errors</a></li>
+<li><a class="reference internal" href="#fixed-possible-division-by-zero-in-polarization-code">Fixed possible division by zero in polarization code</a></li>
+<li><a class="reference internal" href="#avoided-numerical-overflow-with-overlapping-atoms-in-verlet-scheme">Avoided numerical overflow with overlapping atoms in Verlet scheme</a></li>
+<li><a class="reference internal" href="#relax-pull-pbc-check">Relax pull PBC check</a></li>
+<li><a class="reference internal" href="#add-detection-for-armv7-cycle-counter-support">Add detection for ARMv7 cycle counter support</a></li>
+<li><a class="reference internal" href="#introduced-fatal-error-for-too-few-frames-in-gmx-dos">Introduced fatal error for too few frames in <code class="docutils literal"><span class="pre">gmx</span> <span class="pre">dos</span></code></a></li>
+<li><a class="reference internal" href="#properly-reset-cuda-application-clocks">Properly reset CUDA application clocks</a></li>
+<li><a class="reference internal" href="#fixed-replica-exchange-debug-output-to-all-go-to-the-debug-file">Fixed replica-exchange debug output to all go to the debug file</a></li>
+<li><a class="reference internal" href="#fixed-gmx-mdrun-membed-to-always-run-on-a-single-rank">Fixed gmx mdrun -membed to always run on a single rank</a></li>
+<li><a class="reference internal" href="#fixed-issues-with-using-int-for-number-of-simulation-steps">Fixed issues with using int for number of simulation steps</a></li>
+<li><a class="reference internal" href="#fixed-trr-magic-number-reading">Fixed trr magic-number reading</a></li>
+<li><a class="reference internal" href="#changed-to-use-only-legal-characters-in-opencl-cache-filename">Changed to use only legal characters in OpenCL cache filename</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#fixes-for-bugs-introduced-during-development">Fixes for bugs introduced during development</a><ul>
+<li><a class="reference internal" href="#fixed-bug-in-v-rescale-thermostat-replica-exchange">Fixed bug in v-rescale thermostat &amp; replica exchange</a></li>
+<li><a class="reference internal" href="#fixed-vsite-bug-with-mpi-openmp">Fixed vsite bug with MPI+OpenMP</a></li>
+<li><a class="reference internal" href="#fixed-some-thread-affinity-cases">Fixed some thread affinity cases</a></li>
+<li><a class="reference internal" href="#removed-openmp-overhead-at-high-parallelization">Removed OpenMP overhead at high parallelization</a></li>
+<li><a class="reference internal" href="#removed-std-thread-hardware-concurrency">Removed std::thread::hardware_concurrency()</a></li>
+<li><a class="reference internal" href="#added-support-for-linking-against-external-tinyxml-2">Added support for linking against external TinyXML-2</a></li>
+<li><a class="reference internal" href="#fixed-data-race-in-hwinfo-with-thread-mpi">Fixed data race in hwinfo with thread-MPI</a></li>
+<li><a class="reference internal" href="#fixes-for-power7-big-endian">Fixes for Power7 big-endian</a></li>
+<li><a class="reference internal" href="#reduce-hwloc-cpuid-test-requirements">Reduce hwloc &amp; cpuid test requirements</a></li>
+<li><a class="reference internal" href="#work-around-compilation-issue-with-random-test-on-32-bit-machines">Work around compilation issue with random test on 32-bit machines</a></li>
+<li><a class="reference internal" href="#updated-gmx-wham-for-the-new-pull-setup">Updated <code class="docutils literal"><span class="pre">gmx</span> <span class="pre">wham</span></code> for the new pull setup</a></li>
+<li><a class="reference internal" href="#fix-membed-with-partial-revert-of-29943f">Fix membed with partial revert of 29943f</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="tools.html"
+                        title="previous chapter">Improvements to GROMACS tools</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="removed-features.html"
+                        title="next chapter">Removed mdrun features</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../../_sources/release-notes/2016/major/bugs-fixed.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="removed-features.html" title="Removed mdrun features"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="tools.html" title="Improvements to GROMACS tools"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">GROMACS 2018.2-dev</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Release notes</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, GROMACS development team.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.7.
+    </div>
+  </body>
+</html>

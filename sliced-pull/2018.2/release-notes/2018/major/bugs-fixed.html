@@ -1,0 +1,373 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Bugs fixed &#8212; GROMACS 2018.2-dev-20180625-5a59b98c3 documentation</title>
+    <link rel="stylesheet" href="../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '2018.2-dev-20180625-5a59b98c3',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Removed features" href="removed-features.html" />
+    <link rel="prev" title="Improvements to GROMACS tools" href="tools.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="removed-features.html" title="Removed features"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="tools.html" title="Improvements to GROMACS tools"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">GROMACS 2018.2-dev</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Release notes</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="bugs-fixed">
+<h1>Bugs fixed<a class="headerlink" href="#bugs-fixed" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="fixed-multiple-time-stepping-with-parrinello-rahman-and-nose-hoover">
+<h2>Fixed multiple time stepping with Parrinello-Rahman and Nose-Hoover.<a class="headerlink" href="#fixed-multiple-time-stepping-with-parrinello-rahman-and-nose-hoover" title="Permalink to this headline">¶</a></h2>
+<p>These now work in correct Trotter style, applied once and scaled by
+the correct number of steps.</p>
+<p>Fixes <a class="reference external" href="https://redmine.gromacs.org/issues/2031">Issue 2031</a>
+Fixes <a class="reference external" href="https://redmine.gromacs.org/issues/2032">Issue 2032</a></p>
+</div>
+<div class="section" id="applied-berendsen-pressure-coupling-only-at-nstpcouple-steps">
+<h2>Applied Berendsen pressure coupling only at nstpcouple steps<a class="headerlink" href="#applied-berendsen-pressure-coupling-only-at-nstpcouple-steps" title="Permalink to this headline">¶</a></h2>
+<p>Berendsen pressure coupling was mistakenly applied on successive
+steps. Since there is no need for this, this is changed to act only on
+nstpcouple steps. Note that this change prevents continuation from old
+checkpoint files for Berendsen pressuring-coupling runs, since the
+previous-step pressure is no longer stored.</p>
+</div>
+<div class="section" id="added-missing-ewald-correction-for-pme-user">
+<h2>Added missing Ewald correction for PME-User<a class="headerlink" href="#added-missing-ewald-correction-for-pme-user" title="Permalink to this headline">¶</a></h2>
+<p>With <a class="reference internal" href="../../../user-guide/mdp-options.html#mdp-value-coulombtype=PME-User"><code class="xref std std-mdp-value docutils literal"><span class="pre">coulombtype=PME-User</span></code></a>, the Ewald mesh energy was not subtracted
+leading to (very) incorrect Coulomb energies and forces.</p>
+<p>Fixes <a class="reference external" href="https://redmine.gromacs.org/issues/2286">Issue 2286</a></p>
+</div>
+<div class="section" id="fixed-incorrect-dv-dlambda-for-walls">
+<h2>Fixed incorrect dV/dlambda for walls<a class="headerlink" href="#fixed-incorrect-dv-dlambda-for-walls" title="Permalink to this headline">¶</a></h2>
+<p>The free-energy derivative dV/dlambda for walls, which can be
+perturbed by changing atom types of non-wall atoms, only contained the
+B-state contribution.</p>
+<p>Fixes <a class="reference external" href="https://redmine.gromacs.org/issues/2267">Issue 2267</a></p>
+</div>
+<div class="section" id="supported-openmp-for-orientation-restraints">
+<h2>Supported OpenMP for orientation restraints<a class="headerlink" href="#supported-openmp-for-orientation-restraints" title="Permalink to this headline">¶</a></h2>
+<p>Previously this was broken, but has been fixed and is now tested and
+supported.</p>
+</div>
+<div class="section" id="fixed-orientation-restraint-reference">
+<h2>Fixed orientation restraint reference<a class="headerlink" href="#fixed-orientation-restraint-reference" title="Permalink to this headline">¶</a></h2>
+<p>The resetting of the COM of the molecule with orientation restraints
+for fitting to the reference structure was done with the COM of the
+reference structure instead of the instantaneous structure. This does
+not affect the restraining (unless ensemble averaging is used), only
+the printed orientation tensor.</p>
+<p>Fixes <a class="reference external" href="https://redmine.gromacs.org/issues/2219">Issue 2219</a></p>
+</div>
+<div class="section" id="used-graph-with-orientation-restraints">
+<h2>Used graph with orientation restraints<a class="headerlink" href="#used-graph-with-orientation-restraints" title="Permalink to this headline">¶</a></h2>
+<p>With the Verlet cut-off scheme by default molecules are not made whole.
+Now they are made whole when orientation restraints are used.
+Added checks and assertions for correct PBC treatment with orientation
+restraints.</p>
+<p>Fixes <a class="reference external" href="https://redmine.gromacs.org/issues/2228">Issue 2228</a></p>
+</div>
+<div class="section" id="fixed-ekin-at-step-0-with-com-removal">
+<h2>Fixed Ekin at step 0 with COM removal<a class="headerlink" href="#fixed-ekin-at-step-0-with-com-removal" title="Permalink to this headline">¶</a></h2>
+<p>The kinetic energy at step 0 was computed from the velocities without
+the center of mass velocity removed. This could cause a relatively
+large jump in kinetic energy, especially for small systems.
+Now compute_globals is called twice with COM removal so we get
+the correct kinetic energy.</p>
+</div>
+<div class="section" id="fixed-gmx-grompp-with-andersen-massive-and-no-com-removal">
+<h2>Fixed <a class="reference internal" href="../../../onlinehelp/gmx-grompp.html#gmx-grompp"><span class="std std-ref">gmx grompp</span></a> with Andersen massive and no COM removal<a class="headerlink" href="#fixed-gmx-grompp-with-andersen-massive-and-no-com-removal" title="Permalink to this headline">¶</a></h2>
+<p>Fixed a floating point exception leading to a segv.
+Also fixed possible different rounding for the interval for
+Andersen massive in <a class="reference internal" href="../../../onlinehelp/gmx-grompp.html#gmx-grompp"><span class="std std-ref">gmx grompp</span></a> in mdrun for the common case where tau-t
+is a multiple of delta-t.</p>
+<p>Fixes <a class="reference external" href="https://redmine.gromacs.org/issues/2256">Issue 2256</a></p>
+</div>
+<div class="section" id="improved-verlet-buffer-constraint-estimate">
+<h2>Improved Verlet buffer constraint estimate<a class="headerlink" href="#improved-verlet-buffer-constraint-estimate" title="Permalink to this headline">¶</a></h2>
+<p>The displacement estimate for a constrained atom (typically H)
+rotating around the COM with a partner atom is now derived and
+documented correctly.  Note that we (still) use a Gaussian with
+matched variance, which results in a much larger buffer than
+necessary, since the tail of the displacement distribution sets the
+buffer size and the Gaussian has a long tail whereas the actual
+distribution has no tail.</p>
+</div>
+<div class="section" id="fixed-virtual-site-generation-for-water-oxygens-not-named-ow">
+<h2>Fixed virtual site generation for water oxygens not named OW<a class="headerlink" href="#fixed-virtual-site-generation-for-water-oxygens-not-named-ow" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference internal" href="../../../onlinehelp/gmx-pdb2gmx.html#gmx-pdb2gmx"><span class="std std-ref">gmx pdb2gmx</span></a> would break when generating virtual sites if water oxygens
+were not named OW. Now checking for the atomnumber instead.</p>
+<p>Fixes <a class="reference external" href="https://redmine.gromacs.org/issues/2268">Issue 2268</a></p>
+</div>
+<div class="section" id="fixed-thread-mpi-rank-choice-for-orientation-restraints">
+<h2>Fixed thread-MPI rank choice for orientation restraints<a class="headerlink" href="#fixed-thread-mpi-rank-choice-for-orientation-restraints" title="Permalink to this headline">¶</a></h2>
+<p>Only a single rank is supported, so that must be what the thread-MPI
+code will choose. There’s another check later on that catches the
+multi-rank MPI case.</p>
+</div>
+<div class="section" id="fixed-some-incorrect-behavior-with-gmx-solvate">
+<h2>Fixed some incorrect behavior with <a class="reference internal" href="../../../onlinehelp/gmx-solvate.html#gmx-solvate"><span class="std std-ref">gmx solvate</span></a><a class="headerlink" href="#fixed-some-incorrect-behavior-with-gmx-solvate" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference internal" href="../../../onlinehelp/gmx-solvate.html#gmx-solvate"><span class="std std-ref">gmx solvate</span></a> cannot replicate non-rectangular solvent boxes correctly
+(there are several different places that assume a diagonal box matrix),
+so give a fatal error if that is attempted.  To support some uses with
+triclinic boxes, skip the replication step if the solvent and target box
+sizes are already equal.</p>
+<p>Support for general triclinic boxes can be added separately, and the
+check introduced here can be valuable even in that case: it keeps a
+pre-equilibrated solvent box intact if the target box size is the same.</p>
+<p>Related to fix of <a class="reference external" href="https://redmine.gromacs.org/issues/2148">Issue 2148</a></p>
+</div>
+<div class="section" id="fixed-dd-exact-continuation-in-reproducible-node">
+<h2>Fixed DD exact continuation in reproducible node<a class="headerlink" href="#fixed-dd-exact-continuation-in-reproducible-node" title="Permalink to this headline">¶</a></h2>
+<p>With domain decomposition, the local atom density, used for setting
+the search grid for sorting particles, was based on the local atom
+count including atoms/charge groups that would be moved to neighboring
+cells. This lead to a different density value, which in turn could
+result in a different number of search grid cells and thus a different
+summation order during a run compared with continuing that run from a
+checkpoint, when no atoms would be moved. That difference violated
+the intention of <code class="docutils literal"><span class="pre">mdrun</span> <span class="pre">-reprod</span></code>, and is now fixed.</p>
+<p>Refs Fixes <a class="reference external" href="https://redmine.gromacs.org/issues/2318">Issue 2318</a></p>
+</div>
+<div class="section" id="made-mdrun-only-stop-at-nstlist-steps-with-mdrun-reprod">
+<h2>Made mdrun only stop at nstlist steps with mdrun -reprod<a class="headerlink" href="#made-mdrun-only-stop-at-nstlist-steps-with-mdrun-reprod" title="Permalink to this headline">¶</a></h2>
+<p>Stopping mdrun with two INT or TERM signals (e.g. from Ctrl-C from the
+terminal shell) would always happen right after the first global
+communication step. But this breaks exact continuation. Now with
+<code class="docutils literal"><span class="pre">mdrun</span> <span class="pre">-reprod</span></code> a second signal will still stop at a pair-list
+generation step, like with the first signal, so we can still have
+exact continuation.</p>
+<p>Fixes <a class="reference external" href="https://redmine.gromacs.org/issues/2318">Issue 2318</a></p>
+</div>
+<div class="section" id="added-check-for-gpu-detection-support-before-detecting-gpu-devices">
+<h2>Added check for GPU detection support before detecting GPU devices<a class="headerlink" href="#added-check-for-gpu-detection-support-before-detecting-gpu-devices" title="Permalink to this headline">¶</a></h2>
+<p>When a CUDA-enabled binary was run on a node with no CUDA driver
+available, a note was issued that the version of the CUDA driver is
+insufficient, which was wrong and now fixed.</p>
+<p>Fixes <a class="reference external" href="https://redmine.gromacs.org/issues/2322">Issue 2322</a></p>
+</div>
+<div class="section" id="removed-duplicated-lines-from-opls-ffbonded-itp">
+<h2>Removed duplicated lines from OPLS ffbonded.itp<a class="headerlink" href="#removed-duplicated-lines-from-opls-ffbonded-itp" title="Permalink to this headline">¶</a></h2>
+<p>Identical lines have been removed, as identified with uniq.</p>
+<p>Fixes <a class="reference external" href="https://redmine.gromacs.org/issues/1678">Issue 1678</a>.</p>
+</div>
+<div class="section" id="mdrun-no-longer-warns-about-nvml-clocks-that-are-at-max">
+<h2>mdrun no longer warns about NVML clocks that are at max<a class="headerlink" href="#mdrun-no-longer-warns-about-nvml-clocks-that-are-at-max" title="Permalink to this headline">¶</a></h2>
+<p>If the clocks are already maxed out there is no point in echoing
+warnings about not being able to set them.</p>
+<p>Fixes <a class="reference external" href="https://redmine.gromacs.org/issues/2313">Issue 2313</a>.</p>
+</div>
+<div class="section" id="used-reduced-default-tolerances-for-tpx-comparison">
+<h2>Used reduced default tolerances for tpx comparison<a class="headerlink" href="#used-reduced-default-tolerances-for-tpx-comparison" title="Permalink to this headline">¶</a></h2>
+<p>The tolerances for gmx check are mainly intended for handling slight
+statistical deviations, but they can hide differences between tpr
+files, when the user likely wants exact checks on small quantities
+like Lennard-Jones parameters. This changes changes the default
+relative tolerance to 0.000001 and the absolute tolerance to zero, so
+that we only allow for any minor differences due to compiler
+optimization.</p>
+<p>Fixes <a class="reference external" href="https://redmine.gromacs.org/issues/2024">Issue 2024</a>.</p>
+</div>
+<div class="section" id="fixed-return-values-of-frame-reading-functions">
+<h2>Fixed return values of frame-reading functions<a class="headerlink" href="#fixed-return-values-of-frame-reading-functions" title="Permalink to this headline">¶</a></h2>
+<p>This function was based on read_first_x that returned the number of
+atoms, and was documented to do the same, but has always returned a
+logical boolean about whether a frame has been read. This led to
+aspects of <code class="docutils literal"><span class="pre">gmx</span> <span class="pre">spatial</span></code> and <code class="docutils literal"><span class="pre">gmx</span> <span class="pre">trjcat</span> <span class="pre">-demux</span></code> being broken.</p>
+<p>Fixed by returning a proper bool, and fixing the remaining logic that
+used the return value in a non-boolean sense.</p>
+<p>Refs <a class="reference external" href="https://redmine.gromacs.org/issues/2157">Issue 2157</a></p>
+</div>
+<div class="section" id="removed-pbc-before-generating-tpr-with-group-scheme">
+<h2>Removed PBC before generating TPR with group scheme<a class="headerlink" href="#removed-pbc-before-generating-tpr-with-group-scheme" title="Permalink to this headline">¶</a></h2>
+<p>Ensure that all molecules have been made whole before generating the
+run input file when using the group scheme, to avoid error messages
+for large charge groups when molecules are broken over PBC boundaries.</p>
+<p>Fixes <a class="reference external" href="https://redmine.gromacs.org/issues/2339">Issue 2339</a></p>
+</div>
+<div class="section" id="fixed-pbc-error-in-gmx-spatial">
+<h2>Fixed PBC error in gmx_spatial<a class="headerlink" href="#fixed-pbc-error-in-gmx-spatial" title="Permalink to this headline">¶</a></h2>
+<p>Fixes <a class="reference external" href="https://redmine.gromacs.org/issues/2157">Issue 2157</a>.</p>
+</div>
+<div class="section" id="documented-power-spectrum-options-of-gmx-velacc">
+<h2>Documented power spectrum options of gmx velacc<a class="headerlink" href="#documented-power-spectrum-options-of-gmx-velacc" title="Permalink to this headline">¶</a></h2>
+<p>Fixes <a class="reference external" href="https://redmine.gromacs.org/issues/2019">Issue 2019</a>.</p>
+</div>
+<div class="section" id="changed-to-require-tpr-file-for-gmx-cluster">
+<h2>Changed to require .tpr file for gmx cluster<a class="headerlink" href="#changed-to-require-tpr-file-for-gmx-cluster" title="Permalink to this headline">¶</a></h2>
+<p>The program could crash without it, so it wasn’t optional.</p>
+<p>Fixes <a class="reference external" href="https://redmine.gromacs.org/issues/2170">Issue 2170</a>.</p>
+</div>
+<div class="section" id="disallowed-ascii-formats-for-gmx-trjcat">
+<h2>Disallowed ascii formats for gmx trjcat<a class="headerlink" href="#disallowed-ascii-formats-for-gmx-trjcat" title="Permalink to this headline">¶</a></h2>
+<p>Since gmx trjcat (deliberately) does not use any .tpr file, the tool
+can’t handle trajectory formats such as .gro or .pdb where
+atom/residue names are needed.</p>
+<p>Fixes <a class="reference external" href="https://redmine.gromacs.org/issues/2225">Issue 2225</a>.</p>
+</div>
+<div class="section" id="improved-grompp-missing-parameters-error-message">
+<h2>Improved grompp missing-parameters error message<a class="headerlink" href="#improved-grompp-missing-parameters-error-message" title="Permalink to this headline">¶</a></h2>
+<p>If an interaction entry had parameters but not the function type, then
+the error message has been confusing. Note that even when only one
+function type is implemented, the field is still required, which makes
+for ready extensibility.</p>
+<p>Refs <a class="reference external" href="https://redmine.gromacs.org/issues/2144">Issue 2144</a></p>
+</div>
+<div class="section" id="checked-for-large-energy-at-first-step">
+<h2>Checked for large energy at first step<a class="headerlink" href="#checked-for-large-energy-at-first-step" title="Permalink to this headline">¶</a></h2>
+<p>Also added step number to fatal error message.</p>
+<p>Fixes <a class="reference external" href="https://redmine.gromacs.org/issues/2333">Issue 2333</a></p>
+</div>
+<div class="section" id="disallowed-combination-of-pme-user-and-verlet-cutoff">
+<h2>Disallowed combination of PME-user and verlet cutoff<a class="headerlink" href="#disallowed-combination-of-pme-user-and-verlet-cutoff" title="Permalink to this headline">¶</a></h2>
+<p>Fixes <a class="reference external" href="https://redmine.gromacs.org/issues/2332">Issue 2332</a></p>
+</div>
+<div class="section" id="avoided-confusing-message-at-end-of-non-dynamical-runs">
+<h2>Avoided confusing message at end of non-dynamical runs<a class="headerlink" href="#avoided-confusing-message-at-end-of-non-dynamical-runs" title="Permalink to this headline">¶</a></h2>
+<p>Energy minimization, test-particle insertion, normal-mode analysis,
+etc.  are not targets for performance optimization so we will not
+write performance reports. This commit fixes an oversight whereby we
+would warn a user when the lack of performance report is normal and
+expected.</p>
+<p>Fixes <a class="reference external" href="https://redmine.gromacs.org/issues/2172">Issue 2172</a></p>
+</div>
+<div class="section" id="changed-to-require-ntmpi-when-setting-ntomp-and-using-gpus">
+<h2>Changed to require <code class="docutils literal"><span class="pre">-ntmpi</span></code> when setting <code class="docutils literal"><span class="pre">-ntomp</span></code> and using GPUs<a class="headerlink" href="#changed-to-require-ntmpi-when-setting-ntomp-and-using-gpus" title="Permalink to this headline">¶</a></h2>
+<p>With GPUs and thread-MPI, setting only <code class="docutils literal"><span class="pre">gmx</span> <span class="pre">mdrun</span> <span class="pre">-ntomp</span></code> could lead
+to oversubscription of the hardware threads.  Now, with GPUs and
+thread-MPI the user is required to set <code class="docutils literal"><span class="pre">-ntmpi</span></code> when using
+<code class="docutils literal"><span class="pre">-ntomp</span></code>. Here we chose that to also require <code class="docutils literal"><span class="pre">-ntmpi</span></code> when the
+user specified both <code class="docutils literal"><span class="pre">-nt</span></code> and <code class="docutils literal"><span class="pre">-ntomp</span></code>; here we could infer the
+number of ranks, but it’s safer to ask the user to explicity set
+<code class="docutils literal"><span class="pre">-ntmpi</span></code>.  Note that specifying both <code class="docutils literal"><span class="pre">-ntmpi</span></code> and <code class="docutils literal"><span class="pre">-nt</span></code> has
+always worked correctly.</p>
+<p>Fixes <a class="reference external" href="https://redmine.gromacs.org/issues/2348">Issue 2348</a></p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Bugs fixed</a><ul>
+<li><a class="reference internal" href="#fixed-multiple-time-stepping-with-parrinello-rahman-and-nose-hoover">Fixed multiple time stepping with Parrinello-Rahman and Nose-Hoover.</a></li>
+<li><a class="reference internal" href="#applied-berendsen-pressure-coupling-only-at-nstpcouple-steps">Applied Berendsen pressure coupling only at nstpcouple steps</a></li>
+<li><a class="reference internal" href="#added-missing-ewald-correction-for-pme-user">Added missing Ewald correction for PME-User</a></li>
+<li><a class="reference internal" href="#fixed-incorrect-dv-dlambda-for-walls">Fixed incorrect dV/dlambda for walls</a></li>
+<li><a class="reference internal" href="#supported-openmp-for-orientation-restraints">Supported OpenMP for orientation restraints</a></li>
+<li><a class="reference internal" href="#fixed-orientation-restraint-reference">Fixed orientation restraint reference</a></li>
+<li><a class="reference internal" href="#used-graph-with-orientation-restraints">Used graph with orientation restraints</a></li>
+<li><a class="reference internal" href="#fixed-ekin-at-step-0-with-com-removal">Fixed Ekin at step 0 with COM removal</a></li>
+<li><a class="reference internal" href="#fixed-gmx-grompp-with-andersen-massive-and-no-com-removal">Fixed <code class="docutils literal"><span class="pre">gmx</span> <span class="pre">grompp</span></code> with Andersen massive and no COM removal</a></li>
+<li><a class="reference internal" href="#improved-verlet-buffer-constraint-estimate">Improved Verlet buffer constraint estimate</a></li>
+<li><a class="reference internal" href="#fixed-virtual-site-generation-for-water-oxygens-not-named-ow">Fixed virtual site generation for water oxygens not named OW</a></li>
+<li><a class="reference internal" href="#fixed-thread-mpi-rank-choice-for-orientation-restraints">Fixed thread-MPI rank choice for orientation restraints</a></li>
+<li><a class="reference internal" href="#fixed-some-incorrect-behavior-with-gmx-solvate">Fixed some incorrect behavior with <code class="docutils literal"><span class="pre">gmx</span> <span class="pre">solvate</span></code></a></li>
+<li><a class="reference internal" href="#fixed-dd-exact-continuation-in-reproducible-node">Fixed DD exact continuation in reproducible node</a></li>
+<li><a class="reference internal" href="#made-mdrun-only-stop-at-nstlist-steps-with-mdrun-reprod">Made mdrun only stop at nstlist steps with mdrun -reprod</a></li>
+<li><a class="reference internal" href="#added-check-for-gpu-detection-support-before-detecting-gpu-devices">Added check for GPU detection support before detecting GPU devices</a></li>
+<li><a class="reference internal" href="#removed-duplicated-lines-from-opls-ffbonded-itp">Removed duplicated lines from OPLS ffbonded.itp</a></li>
+<li><a class="reference internal" href="#mdrun-no-longer-warns-about-nvml-clocks-that-are-at-max">mdrun no longer warns about NVML clocks that are at max</a></li>
+<li><a class="reference internal" href="#used-reduced-default-tolerances-for-tpx-comparison">Used reduced default tolerances for tpx comparison</a></li>
+<li><a class="reference internal" href="#fixed-return-values-of-frame-reading-functions">Fixed return values of frame-reading functions</a></li>
+<li><a class="reference internal" href="#removed-pbc-before-generating-tpr-with-group-scheme">Removed PBC before generating TPR with group scheme</a></li>
+<li><a class="reference internal" href="#fixed-pbc-error-in-gmx-spatial">Fixed PBC error in gmx_spatial</a></li>
+<li><a class="reference internal" href="#documented-power-spectrum-options-of-gmx-velacc">Documented power spectrum options of gmx velacc</a></li>
+<li><a class="reference internal" href="#changed-to-require-tpr-file-for-gmx-cluster">Changed to require .tpr file for gmx cluster</a></li>
+<li><a class="reference internal" href="#disallowed-ascii-formats-for-gmx-trjcat">Disallowed ascii formats for gmx trjcat</a></li>
+<li><a class="reference internal" href="#improved-grompp-missing-parameters-error-message">Improved grompp missing-parameters error message</a></li>
+<li><a class="reference internal" href="#checked-for-large-energy-at-first-step">Checked for large energy at first step</a></li>
+<li><a class="reference internal" href="#disallowed-combination-of-pme-user-and-verlet-cutoff">Disallowed combination of PME-user and verlet cutoff</a></li>
+<li><a class="reference internal" href="#avoided-confusing-message-at-end-of-non-dynamical-runs">Avoided confusing message at end of non-dynamical runs</a></li>
+<li><a class="reference internal" href="#changed-to-require-ntmpi-when-setting-ntomp-and-using-gpus">Changed to require <code class="docutils literal"><span class="pre">-ntmpi</span></code> when setting <code class="docutils literal"><span class="pre">-ntomp</span></code> and using GPUs</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="tools.html"
+                        title="previous chapter">Improvements to GROMACS tools</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="removed-features.html"
+                        title="next chapter">Removed features</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../../_sources/release-notes/2018/major/bugs-fixed.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="removed-features.html" title="Removed features"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="tools.html" title="Improvements to GROMACS tools"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">GROMACS 2018.2-dev</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Release notes</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, GROMACS development team.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.7.
+    </div>
+  </body>
+</html>
